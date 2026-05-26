@@ -1,0 +1,106 @@
+### REST API Testing Interface - Agro-Intelligence System
+@baseUrl = http://127.0.0.1:5000/api
+
+### 1. Register User (Farmer Account)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Shiva Kumar",
+  "email": "shiva@smartfarm.com",
+  "password": "SecurePassword123",
+  "role": "farmer",
+  "location": "Punjab Regional Farm Alpha",
+  "phone": "+91 98765 43210"
+}
+
+### 2. Login User
+# Note: Cookie will be automatically handled by the HTTP client
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "shiva@smartfarm.com",
+  "password": "SecurePassword123"
+}
+
+### 3. Get Authenticated User Profile (Requires Login Cookie)
+GET {{baseUrl}}/auth/me
+Content-Type: application/json
+
+### 4. Write Soil Telemetry Analysis Record
+POST {{baseUrl}}/soil/add
+Content-Type: application/json
+
+{
+  "moisture": 45.5,
+  "ph": 6.2,
+  "nitrogen": 85.0,
+  "phosphorus": 48.0,
+  "potassium": 42.0,
+  "temperature": 24.8,
+  "ecValue": 1.4
+}
+
+### 5. Retrieve Soil Database History Log
+GET {{baseUrl}}/soil/all
+Content-Type: application/json
+
+### 6. Get Current Weather (Simulated Fallback or OpenWeather)
+GET {{baseUrl}}/weather/current?city=Ludhiana
+Content-Type: application/json
+
+### 7. Get 7-Day Weather Forecast
+GET {{baseUrl}}/weather/forecast?city=Ludhiana
+Content-Type: application/json
+
+### 8. Generate Crop Recommendation (AI Module Heuristics)
+POST {{baseUrl}}/recommendation/generate
+Content-Type: application/json
+
+{
+  "moisture": 45.5,
+  "ph": 6.2,
+  "nitrogen": 85.0,
+  "phosphorus": 48.0,
+  "potassium": 42.0,
+  "temperature": 24.8,
+  "humidity": 78.0,
+  "rainfall": 180.0
+}
+
+### 9. Retrieve Crop Recommendation Logs
+GET {{baseUrl}}/recommendation/history
+Content-Type: application/json
+
+### 10. IoT Sensor Telemetry Upload Simulation (From ESP32)
+POST {{baseUrl}}/sensor/upload
+Content-Type: application/json
+
+{
+  "deviceId": "NODE-01-NPK",
+  "sensorType": "IoT Multi-Sensor Field Node",
+  "batteryLevel": 88,
+  "status": "online",
+  "soilData": {
+    "moisture": 42.1,
+    "ph": 6.4,
+    "nitrogen": 92.0,
+    "phosphorus": 51.0,
+    "potassium": 38.0,
+    "temperature": 23.9,
+    "ecValue": 1.3
+  }
+}
+
+### 11. Retrieve IoT Status Inventory Panel
+GET {{baseUrl}}/sensor/status
+Content-Type: application/json
+
+### 12. Retrieve Disease Analysis Logs
+GET {{baseUrl}}/disease/history
+Content-Type: application/json
+
+### 13. Logout
+POST {{baseUrl}}/auth/logout
+Content-Type: application/json
