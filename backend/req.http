@@ -1,5 +1,8 @@
 ### REST API Testing Interface - Agro-Intelligence System
-@baseUrl = http://127.0.0.1:5000/api
+# Local Development API:
+# @baseUrl = http://127.0.0.1:5000/api
+# Render Production API:
+@baseUrl = https://wheather-and-soil-based-crop-za2r.onrender.com/api
 
 ### 1. Register User (Farmer Account)
 POST {{baseUrl}}/auth/register
