@@ -12,7 +12,7 @@ const determineFertility = (n, p, k) => {
 };
 
 // POST /api/soil/add - Add a new soil log
-router.post('/add', async (req, res) => {
+router.post('/add', authenticateToken, async (req, res) => {
   try {
     const { moisture, ph, nitrogen, phosphorus, potassium, temperature, ecValue } = req.body;
 
@@ -27,6 +27,7 @@ router.post('/add', async (req, res) => {
     const calculatedFertility = determineFertility(n, p, k);
 
     const newSoil = new SoilModel({
+      userId: req.user.id,
       moisture: parseFloat(moisture),
       ph: parseFloat(ph),
       nitrogen: n,

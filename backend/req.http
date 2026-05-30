@@ -104,3 +104,83 @@ Content-Type: application/json
 ### 13. Logout
 POST {{baseUrl}}/auth/logout
 Content-Type: application/json
+
+### 14. Get Marketplace Items Catalog
+GET {{baseUrl}}/platform/marketplace
+Content-Type: application/json
+
+### 15. List New Crop for Sale on Marketplace
+POST {{baseUrl}}/platform/marketplace
+Content-Type: application/json
+
+{
+  "name": "Organic Gold Wheat Grains",
+  "description": "Premium sorted post-harvest grains with 12% moisture index.",
+  "category": "Crops",
+  "price": 18500,
+  "quantity": 5,
+  "sellerName": "Shiva Kumar"
+}
+
+### 16. Book New Agriculture Consultation Session
+POST {{baseUrl}}/platform/consultation/book
+Content-Type: application/json
+
+{
+  "farmerName": "Shiva Kumar",
+  "expertName": "Dr. Ramesh Rao",
+  "date": "2026-06-01",
+  "time": "10:00",
+  "queryText": "Leaf spot diagnostic check on tomato foliage crops."
+}
+
+### 17. List Consultation Bookings History
+GET {{baseUrl}}/platform/consultation
+Content-Type: application/json
+
+### 18. Register New Herd Animal in Livestock DB
+POST {{baseUrl}}/platform/livestock/add
+Content-Type: application/json
+
+{
+  "animalType": "Cow (Holstein)",
+  "tagNumber": "COW-0492",
+  "healthStatus": "Healthy",
+  "age": 36,
+  "weight": 480,
+  "feedSchedule": "Silage + Mineral Mixture",
+  "dailyProduction": 18,
+  "lastVaccinationDate": "2026-05-10"
+}
+
+### 19. Get Registered Livestock Herd Log
+GET {{baseUrl}}/platform/livestock
+Content-Type: application/json
+
+
+### 20. Verify User Email (New Feature)
+POST {{baseUrl}}/auth/verify-email
+Content-Type: application/json
+
+{
+  "email": "shiva@smartfarm.com",
+  "code": "123456"
+}
+
+### 21. Resend Verification Code (New Feature)
+POST {{baseUrl}}/auth/resend-verification
+Content-Type: application/json
+
+{
+  "email": "shiva@smartfarm.com"
+}
+
+### 22. Login User with Role Selection (New Feature)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "shiva@smartfarm.com",
+  "password": "SecurePassword123",
+  "role": "farmer"
+}

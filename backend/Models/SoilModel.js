@@ -42,6 +42,11 @@ const soilSchema = new mongoose.Schema({
     enum: ['High', 'Optimal', 'Low'],
     default: 'Optimal'
   },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
   createdAt: { 
     type: Date, 
     default: Date.now 

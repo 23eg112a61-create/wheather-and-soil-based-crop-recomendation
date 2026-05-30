@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { Leaf, Sun, Cpu, Settings, Thermometer, ShieldAlert, CheckCircle, ArrowRight, Activity, MapPin } from 'lucide-react';
+import { Leaf, Sun, Cpu, ShieldCheck, ArrowRight, Activity, CheckCircle, ChevronDown } from 'lucide-react';
 
 const Landing = () => {
   const { user, t, speak } = useApp();
@@ -24,35 +24,36 @@ const Landing = () => {
   };
 
   return (
-    <div className="w-full relative overflow-hidden flex flex-col">
-      {/* Hero Header Section - Full Background Paddy Field Image with Premium Dark Glassmorphic Overlay */}
+    <div className="w-full relative overflow-hidden flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-200">
+      
+      {/* 1. HERO HEADER SECTION - Full Viewport Farming Wallpaper at starting */}
       <section 
-        className="relative py-24 md:py-32 px-6 md:px-12 text-white text-left flex flex-col lg:flex-row items-center justify-between gap-12 bg-cover bg-center"
+        className="relative min-h-[calc(100vh-76px)] px-6 md:px-12 text-white flex flex-col items-center justify-center text-center bg-cover bg-center"
         style={{ backgroundImage: "url('/paddy_with_seed.png')" }}
         onMouseEnter={handleSpeakWelcome}
       >
-        {/* Sleek, deep gradient overlay to ensure absolute text contrast and premium cinematic feel */}
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/85 to-emerald-950/40 z-0"></div>
+        {/* Sleek, deep glassmorphic gradient overlay for absolute text contrast and premium cinematic feel */}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-emerald-950/40 z-0"></div>
         
-        {/* Left Column Copywriting */}
-        <div className="relative max-w-2xl z-10 space-y-6">
-          <div className="inline-flex items-center space-x-2 bg-emerald-900/60 border border-emerald-500/40 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider text-emerald-300">
+        {/* Left Column Copywriting centered inside container */}
+        <div className="relative max-w-3xl z-10 space-y-8 flex flex-col items-center">
+          <div className="inline-flex items-center space-x-2 bg-emerald-900/60 border border-emerald-500/40 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider text-emerald-300 backdrop-blur-md">
             <Activity size={12} className="animate-pulse" />
             <span>Weather-Based Crop Recommendation Platform</span>
           </div>
 
-          <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-none text-white drop-shadow-md">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight leading-none text-white drop-shadow-md">
             {t('landingTagline')}
           </h1>
-          <p className="text-base md:text-lg text-slate-200 font-light leading-relaxed max-w-xl">
+          <p className="text-base sm:text-lg md:text-xl text-slate-200 font-light leading-relaxed max-w-xl mx-auto drop-shadow">
             {t('landingSub')}
           </p>
 
-          <div className="pt-4 flex flex-wrap gap-4">
+          <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center items-center w-full">
             {user ? (
               <Link
                 to="/crop-recommendation"
-                className="bg-emerald-500 hover:bg-emerald-600 text-slate-900 font-extrabold px-8 py-4 rounded-xl shadow-lg hover:shadow-emerald-500/30 transition-all flex items-center space-x-2 transform hover:-translate-y-0.5"
+                className="bg-emerald-500 hover:bg-emerald-600 text-slate-900 font-extrabold px-10 py-4.5 rounded-2xl shadow-lg hover:shadow-emerald-500/30 transition-all flex items-center space-x-2 transform hover:-translate-y-0.5"
               >
                 <span>Generate AI Recommendation</span>
                 <ArrowRight size={18} />
@@ -61,14 +62,14 @@ const Landing = () => {
               <>
                 <Link
                   to="/signup"
-                  className="bg-emerald-500 hover:bg-emerald-600 text-slate-900 font-extrabold px-8 py-4 rounded-xl shadow-lg hover:shadow-emerald-500/30 transition-all flex items-center space-x-2 transform hover:-translate-y-0.5"
+                  className="bg-emerald-500 hover:bg-emerald-600 text-slate-900 font-extrabold px-10 py-4.5 rounded-2xl shadow-lg hover:shadow-emerald-500/30 transition-all flex items-center space-x-2 transform hover:-translate-y-0.5 w-full sm:w-auto justify-center"
                 >
-                  <span>Get Started for Free</span>
+                  <span>Get Started Now</span>
                   <ArrowRight size={18} />
                 </Link>
                 <Link
                   to="/login"
-                  className="bg-slate-900/90 border border-slate-700 hover:bg-slate-800 text-white font-bold px-8 py-4 rounded-xl transition-all shadow-md transform hover:-translate-y-0.5"
+                  className="bg-slate-900/90 border border-slate-700 hover:bg-slate-800 text-white font-bold px-10 py-4.5 rounded-2xl transition-all shadow-md transform hover:-translate-y-0.5 backdrop-blur-md w-full sm:w-auto justify-center flex items-center"
                 >
                   Login
                 </Link>
@@ -77,26 +78,14 @@ const Landing = () => {
           </div>
         </div>
 
-        {/* Right Column: Colorful farming telemetry preview tablet widget */}
-        <div className="relative z-10 w-full lg:w-[460px] h-[320px] md:h-[350px] rounded-3xl overflow-hidden shadow-2xl border-4 border-emerald-500/30 flex-shrink-0 group">
-          <img 
-            src="/farmer_tablet.png" 
-            alt="CropWeather precision agriculture intelligence tablet" 
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-slate-950/20 to-transparent pointer-events-none"></div>
-          {/* Live Telemetry Pill floating on top */}
-          <div className="absolute bottom-4 left-4 bg-emerald-950/80 backdrop-blur border border-emerald-500/40 p-3 rounded-2xl flex items-center space-x-3 text-left">
-            <div className="h-2 w-2 rounded-full bg-emerald-500 animate-ping"></div>
-            <div>
-              <span className="block text-[8px] uppercase tracking-wider text-slate-400 font-bold">NPK SENSOR SCAN</span>
-              <span className="block text-xs font-bold text-white">Grid Zone #14 Calibrated</span>
-            </div>
-          </div>
+        {/* Scroll Indicator Prompt */}
+        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center text-slate-400 text-xs font-semibold tracking-wider animate-bounce pointer-events-none">
+          <span>Scroll to explore features</span>
+          <ChevronDown size={18} className="mt-1" />
         </div>
       </section>
 
-      {/* Main Core Features Matrix - Refactored to be extremely clear and visual */}
+      {/* 2. MAIN CORE FEATURES MATRIX */}
       <section className="py-20 px-6 max-w-7xl mx-auto w-full">
         <div className="text-center space-y-4 mb-16">
           <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white">
@@ -108,8 +97,8 @@ const Landing = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {/* Card 1: Soil Analysis with embedded probe image */}
-          <Link to="/soil-analysis" className="glassmorphism rounded-3xl card-transition text-left block overflow-hidden border border-slate-200/50">
+          {/* Card 1: Soil Analysis with probe image */}
+          <Link to="/soil-analysis" className="glassmorphism rounded-3xl card-transition text-left block overflow-hidden border border-slate-200/50 dark:border-emerald-800/25">
             <div className="h-44 w-full overflow-hidden relative">
               <img src="/soil_probe.png" alt="Soil Health laboratory" className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
@@ -126,7 +115,7 @@ const Landing = () => {
           </Link>
 
           {/* Card 2: Weather Forecast */}
-          <Link to="/weather" className="glassmorphism rounded-3xl card-transition text-left block overflow-hidden border border-slate-200/50">
+          <Link to="/weather" className="glassmorphism rounded-3xl card-transition text-left block overflow-hidden border border-slate-200/50 dark:border-emerald-800/25">
             <div className="h-44 w-full overflow-hidden relative">
               <img src="/weather_forecast.png" alt="Meteorological Climate Radar" className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
@@ -143,7 +132,7 @@ const Landing = () => {
           </Link>
 
           {/* Card 3: Crop Recommendation */}
-          <Link to="/crop-recommendation" className="glassmorphism rounded-3xl card-transition text-left block overflow-hidden border border-slate-200/50">
+          <Link to="/crop-recommendation" className="glassmorphism rounded-3xl card-transition text-left block overflow-hidden border border-slate-200/50 dark:border-emerald-800/25">
             <div className="h-44 w-full overflow-hidden relative">
               <img src="/crop_matcher.png" alt="Crop Suitability Matcher" className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
@@ -154,13 +143,13 @@ const Landing = () => {
                 Crop Suitability Matcher
               </h3>
               <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">
-                Evaluate optimal crop strategies against soil NPK, acidity pH levels, and rainfall scales to maximize production yields.
+                Evaluate optimal crop suitability options against soil parameters, acidity pH levels, and rainfall cycles to safeguard harvest values.
               </p>
             </div>
           </Link>
 
-          {/* Card 4: Disease Detection with embedded scan image */}
-          <Link to="/disease-detection" className="glassmorphism rounded-3xl card-transition text-left block overflow-hidden border border-slate-200/50">
+          {/* Card 4: Disease Detection */}
+          <Link to="/disease-detection" className="glassmorphism rounded-3xl card-transition text-left block overflow-hidden border border-slate-200/50 dark:border-emerald-800/25">
             <div className="h-44 w-full overflow-hidden relative">
               <img src="/disease_scan.png" alt="Disease scanning" className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
@@ -171,13 +160,13 @@ const Landing = () => {
                 Foliar Disease Diagnostic Scanner
               </h3>
               <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">
-                Upload leaf photographs to identify crop infections. Returns exact plant disease matching, suggested pesticides, and preventative recipes.
+                Upload leaf photographs to identify crop infections. Returns plant disease matching, suggested pesticide formulas, and organic solutions.
               </p>
             </div>
           </Link>
 
           {/* Card 5: Smart Irrigation */}
-          <Link to="/irrigation" className="glassmorphism rounded-3xl card-transition text-left block overflow-hidden border border-slate-200/50">
+          <Link to="/irrigation" className="glassmorphism rounded-3xl card-transition text-left block overflow-hidden border border-slate-200/50 dark:border-emerald-800/25">
             <div className="h-44 w-full overflow-hidden relative">
               <img src="/smart_irrigation.png" alt="Automated Irrigation" className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
@@ -188,13 +177,13 @@ const Landing = () => {
                 Automated Irrigation Pump Valve
               </h3>
               <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">
-                Monitor soil hydration percentages, calculate target volumetric flow rates, and trigger simulated solenoid valve pump relays.
+                Monitor soil hydration percentages, calculate volumetric target flows, and simulate dynamic pump solenoid relay toggles.
               </p>
             </div>
           </Link>
 
           {/* Card 6: IoT Node Inventory */}
-          <Link to="/sensors" className="glassmorphism rounded-3xl card-transition text-left block overflow-hidden border border-slate-200/50">
+          <Link to="/sensors" className="glassmorphism rounded-3xl card-transition text-left block overflow-hidden border border-slate-200/50 dark:border-emerald-800/25">
             <div className="h-44 w-full overflow-hidden relative">
               <img src="/iot_nodes.png" alt="Distributed Telemetry Nodes" className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
@@ -205,15 +194,15 @@ const Landing = () => {
                 Distributed Telemetry Nodes
               </h3>
               <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">
-                Oversee your hardware node network (ESP32 microcontrollers). Audit wireless signals, battery levels, and active status feeds.
+                Oversee hardware wireless inventory nodes (ESP32 microcontrollers). Review battery status, active telemetry frequencies, and link diagnostics.
               </p>
             </div>
           </Link>
         </div>
       </section>
 
-      {/* Dynamic Precision Farming Video Demonstration Showcase */}
-      <section className="py-20 px-6 max-w-7xl mx-auto w-full border-t border-slate-200/30">
+      {/* 3. DYNAMIC PRECISION FARMING DEMONSTRATION SHOWCASE */}
+      <section className="py-20 px-6 max-w-7xl mx-auto w-full border-t border-slate-200/30 dark:border-slate-800/40">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-6 text-left">
             <div className="bg-emerald-100 dark:bg-emerald-900/40 p-2 rounded-xl text-emerald-700 dark:text-emerald-300 font-bold text-xs uppercase w-fit">
@@ -227,21 +216,25 @@ const Landing = () => {
             </p>
           </div>
           
-          {/* Responsive HTML5 video player framework */}
-          <div className="w-full aspect-video rounded-3xl overflow-hidden shadow-2xl border-4 border-slate-200/50 relative">
-            <iframe 
-              className="w-full h-full"
-              src="https://www.youtube.com/embed/a38_2x3XbQA" 
-              title="Smart Precision Farming Overview" 
-              frameBorder="0" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-              allowFullScreen
-            ></iframe>
+          {/* Video Player */}
+          <div className="w-full aspect-video rounded-3xl overflow-hidden shadow-2xl border-4 border-slate-200/50 dark:border-slate-800/20 relative">
+            <video 
+              className="w-full h-full object-cover" 
+              controls 
+              poster="/smart_farm_hero.png"
+              preload="metadata"
+            >
+              <source 
+                src="https://assets.mixkit.co/videos/preview/mixkit-hands-of-a-farmer-holding-soil-with-a-sprout-43095-large.mp4" 
+                type="video/mp4" 
+              />
+              Your browser does not support the video tag.
+            </video>
           </div>
         </div>
       </section>
 
-      {/* Interactive Soil Simulation Widget */}
+      {/* 4. INTERACTIVE SOIL SIMULATION WIDGET */}
       <section className="py-20 px-6 bg-emerald-50 dark:bg-emerald-950/20 w-full border-y border-slate-200 dark:border-emerald-900/30">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-6 text-left">
@@ -293,8 +286,8 @@ const Landing = () => {
             </div>
           </div>
 
-          {/* Visualization Card */}
-          <div className="glassmorphism p-8 rounded-3xl flex flex-col justify-between space-y-6 text-left shadow-lg border border-white">
+          {/* Heuristic Live Visualizing Card */}
+          <div className="glassmorphism p-8 rounded-3xl flex flex-col justify-between space-y-6 text-left shadow-lg border border-white dark:border-emerald-800/10">
             <div className="flex items-center justify-between border-b border-slate-200 dark:border-emerald-800/40 pb-4">
               <span className="text-xs font-bold uppercase text-slate-500 tracking-wider">AI Classifier Matching Output</span>
               <span className="bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded text-xs font-semibold">Live Preview</span>
@@ -319,8 +312,8 @@ const Landing = () => {
                 <span className="font-bold text-emerald-600">High (94%)</span>
               </div>
               <Link 
-                to="/crop-recommendation" 
-                className="bg-emerald-600 hover:bg-emerald-700 text-white text-center font-bold py-2.5 rounded-xl text-sm transition-all"
+                to="/signup" 
+                className="bg-emerald-600 hover:bg-emerald-700 text-white text-center font-bold py-2.5 rounded-xl text-sm transition-all shadow-inner"
               >
                 Log in to generate full diagnostics
               </Link>
@@ -329,7 +322,7 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Trust / About Agriculture System Section */}
+      {/* 5. TRUST / TELEMETRY CYCLE SUMMARY */}
       <section className="py-20 px-6 max-w-6xl mx-auto w-full text-center">
         <div className="max-w-3xl mx-auto space-y-6">
           <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white">
@@ -339,21 +332,21 @@ const Landing = () => {
             Distributed ESP32 microcontrollers measure raw nitrogen, phosphorus, potassium, pH levels, and soil moisture directly from field nodes. These values are securely uploaded through encrypted protocols to Mongoose cloud databases. The heuristic engines process weather trends alongside chemical compositions to recommend crops, fertilizers, and irrigation parameters.
           </p>
           <div className="pt-6 grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
-            <div className="flex items-start space-x-3 bg-white dark:bg-emerald-950/20 p-5 rounded-2xl border border-slate-100 dark:border-emerald-900/30">
+            <div className="flex items-start space-x-3 bg-white dark:bg-emerald-950/20 p-5 rounded-2xl border border-slate-100 dark:border-emerald-900/30 shadow-sm">
               <CheckCircle className="text-emerald-500 mt-1 flex-shrink-0" size={18} />
               <div>
                 <h4 className="font-bold text-slate-800 dark:text-white text-sm">IoT Telemetry</h4>
                 <p className="text-slate-500 text-xs mt-1">Live physical reads avoid human data entry errors.</p>
               </div>
             </div>
-            <div className="flex items-start space-x-3 bg-white dark:bg-emerald-950/20 p-5 rounded-2xl border border-slate-100 dark:border-emerald-900/30">
+            <div className="flex items-start space-x-3 bg-white dark:bg-emerald-950/20 p-5 rounded-2xl border border-slate-100 dark:border-emerald-900/30 shadow-sm">
               <CheckCircle className="text-emerald-500 mt-1 flex-shrink-0" size={18} />
               <div>
                 <h4 className="font-bold text-slate-800 dark:text-white text-sm">Weather Integrations</h4>
                 <p className="text-slate-500 text-xs mt-1">Dynamic warnings avoid drought and flood exposure.</p>
               </div>
             </div>
-            <div className="flex items-start space-x-3 bg-white dark:bg-emerald-950/20 p-5 rounded-2xl border border-slate-100 dark:border-emerald-900/30">
+            <div className="flex items-start space-x-3 bg-white dark:bg-emerald-950/20 p-5 rounded-2xl border border-slate-100 dark:border-emerald-900/30 shadow-sm">
               <CheckCircle className="text-emerald-500 mt-1 flex-shrink-0" size={18} />
               <div>
                 <h4 className="font-bold text-slate-800 dark:text-white text-sm">Yield Security</h4>

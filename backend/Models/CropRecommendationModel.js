@@ -29,6 +29,19 @@ const cropRecommendationSchema = new mongoose.Schema({
     type: String, 
     required: true 
   },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
+  moisture: { type: Number, default: 0 },
+  ph: { type: Number, default: 0 },
+  nitrogen: { type: Number, default: 0 },
+  phosphorus: { type: Number, default: 0 },
+  potassium: { type: Number, default: 0 },
+  temperature: { type: Number, default: 0 },
+  humidity: { type: Number, default: 0 },
+  rainfall: { type: Number, default: 0 },
   createdAt: { 
     type: Date, 
     default: Date.now 

@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
   },
   role: { 
     type: String, 
-    enum: ['farmer', 'admin', 'expert', 'analyst_weather'], 
+    enum: ['farmer', 'admin', 'expert'], 
     default: 'farmer' 
   },
   location: { 
@@ -30,9 +30,42 @@ const userSchema = new mongoose.Schema({
     type: String, 
     default: '' 
   },
+  status: {
+    type: String,
+    enum: ['Active', 'Inactive'],
+    default: 'Active'
+  },
+  landArea: {
+    type: String,
+    default: ''
+  },
+  lastLogin: {
+    type: Date,
+    default: null
+  },
+  activities: [{
+    action: { type: String, required: true },
+    timestamp: { type: Date, default: Date.now },
+    details: { type: String, default: '' }
+  }],
+  cropSuggestions: [{
+    type: String
+  }],
   createdAt: { 
     type: Date, 
     default: Date.now 
+  },
+  isVerified: {
+    type: Boolean,
+    default: false
+  },
+  verificationCode: {
+    type: String,
+    default: null
+  },
+  verificationCodeExpires: {
+    type: Date,
+    default: null
   }
 });
 

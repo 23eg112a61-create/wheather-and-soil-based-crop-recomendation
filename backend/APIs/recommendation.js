@@ -155,6 +155,15 @@ router.post('/generate', authenticateToken, async (req, res) => {
     const recommendation = evaluateCropRecommendation(n, p, k, phVal, temp, hum, rain);
 
     const newRecommendation = new CropRecommendationModel({
+      userId: req.user.id,
+      moisture: parseFloat(moisture),
+      ph: phVal,
+      nitrogen: n,
+      phosphorus: p,
+      potassium: k,
+      temperature: temp,
+      humidity: hum,
+      rainfall: rain,
       recommendedCrop: recommendation.recommendedCrop,
       confidenceScore: recommendation.confidenceScore,
       fertilizerSuggestion: recommendation.fertilizerSuggestion,

@@ -1,10 +1,10 @@
+import 'dotenv/config';
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import dotenv from 'dotenv';
 
 // Import routers
 import authRouter from './APIs/auth.js';
@@ -13,8 +13,9 @@ import weatherRouter from './APIs/weather.js';
 import recommendationRouter from './APIs/recommendation.js';
 import sensorRouter from './APIs/sensor.js';
 import diseaseRouter from './APIs/disease.js';
+import platformRouter from './APIs/platform.js';
+import adminRouter from './APIs/admin.js';
 
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -24,14 +25,25 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 app.use(helmet());
 
 // 2. CORS: Explicit allow-list, NO wildcard * origins
-const allowedOrigins = ['http://localhost:5173', 'http://127.0.0.1:5173'];
+const allowedOrigins = [
+  'http://localhost:5173', 'http://127.0.0.1:5173', 'http://[::1]:5173',
+  'http://localhost:5174', 'http://127.0.0.1:5174', 'http://[::1]:5174',
+  'http://localhost:5175', 'http://127.0.0.1:5175', 'http://[::1]:5175'
+];
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (like mobile apps, curl, or local tools during dev)
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Rejected: CORS security policy violation. Origin not allowed.'));
+      // Dynamic allowance for local network IPs and loopback devices on development ports 5173-5179
+      const isLocalDev = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\]|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+):517[3-9]$/.test(origin);
+      if (isLocalDev) {
+        callback(null, true);
+      } else {
+        console.warn(`[CORS Rejected]: Origin "${origin}" is not in the allow-list.`);
+        callback(new Error(`Rejected: CORS security policy violation. Origin not allowed: ${origin}`));
+      }
     }
   },
   credentials: true,
@@ -71,6 +83,9 @@ app.use('/api/weather', weatherRouter);
 app.use('/api/recommendation', recommendationRouter);
 app.use('/api/sensor', sensorRouter);
 app.use('/api/disease', diseaseRouter);
+app.use('/api/platform', platformRouter);
+app.use('/api/admin', adminRouter);
+
 
 // 7. Base API Route
 app.get('/', (req, res) => {
@@ -91,12 +106,12 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 9. Start Server listening strictly on localhost / 127.0.0.1 for development security
-const server = app.listen(PORT, '127.0.0.1', () => {
+// 9. Start Server (listen on all network interfaces to allow mobile/LAN device testing)
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`========================================`);
   console.log(` AGRO-INTELLIGENCE CORE SERVER RUNNING  `);
   console.log(` Port: ${PORT}                          `);
-  console.log(` Host: http://127.0.0.1:${PORT}        `);
+  console.log(` Host: http://0.0.0.0:${PORT}          `);
   console.log(` Environment: ${NODE_ENV}               `);
   console.log(`========================================`);
 });

@@ -10,7 +10,6 @@ import Signup from './pages/Signup';
 import ForgotPassword from './pages/ForgotPassword';
 import FarmerDashboard from './pages/FarmerDashboard';
 import AdminDashboard from './pages/AdminDashboard';
-import WeatherAnalystDashboard from './pages/WeatherAnalystDashboard';
 import ExpertDashboard from './pages/ExpertDashboard';
 import SoilAnalysis from './pages/SoilAnalysis';
 import WeatherDashboard from './pages/WeatherDashboard';
@@ -19,6 +18,15 @@ import SensorMonitoring from './pages/SensorMonitoring';
 import DiseaseDetection from './pages/DiseaseDetection';
 import SmartIrrigation from './pages/SmartIrrigation';
 import Chatbot from './pages/Chatbot';
+
+// Import New Platform Pages
+import SustainableFarming from './pages/SustainableFarming';
+import ExpertConsultation from './pages/ExpertConsultation';
+import TrainingEducation from './pages/TrainingEducation';
+import Marketplace from './pages/Marketplace';
+import ResearchHub from './pages/ResearchHub';
+import LivestockDairy from './pages/LivestockDairy';
+import AnalyticsReports from './pages/AnalyticsReports';
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
@@ -108,7 +116,6 @@ function App() {
                   to={
                     user.role === 'admin' ? '/dashboard/admin' :
                     user.role === 'expert' ? '/dashboard/expert' :
-                    user.role === 'analyst_weather' ? '/dashboard/weather' :
                     '/dashboard/farmer'
                   }
                   className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm px-4 py-2 rounded-lg shadow-sm transition-all"
@@ -158,6 +165,15 @@ function App() {
             <Route path="/disease-detection" element={<ProtectedRoute><DiseaseDetection /></ProtectedRoute>} />
             <Route path="/irrigation" element={<ProtectedRoute><SmartIrrigation /></ProtectedRoute>} />
 
+            {/* New Platform Routes */}
+            <Route path="/sustainable-farming" element={<ProtectedRoute><SustainableFarming /></ProtectedRoute>} />
+            <Route path="/expert-consultation" element={<ProtectedRoute><ExpertConsultation /></ProtectedRoute>} />
+            <Route path="/training-education" element={<ProtectedRoute><TrainingEducation /></ProtectedRoute>} />
+            <Route path="/marketplace" element={<ProtectedRoute><Marketplace /></ProtectedRoute>} />
+            <Route path="/research-hub" element={<ProtectedRoute><ResearchHub /></ProtectedRoute>} />
+            <Route path="/livestock-dairy" element={<ProtectedRoute><LivestockDairy /></ProtectedRoute>} />
+            <Route path="/analytics-reports" element={<ProtectedRoute><AnalyticsReports /></ProtectedRoute>} />
+
             {/* Protected Role-specific Dashboards */}
             <Route path="/dashboard/farmer" element={
               <ProtectedRoute>
@@ -172,11 +188,7 @@ function App() {
             } />
 
 
-            <Route path="/dashboard/weather" element={
-              <ProtectedRoute>
-                <RoleRoute allowedRoles={['analyst_weather', 'admin']}><WeatherAnalystDashboard /></RoleRoute>
-              </ProtectedRoute>
-            } />
+
 
             <Route path="/dashboard/expert" element={
               <ProtectedRoute>

@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import UserModel from '../Models/UserModel.js';
+import { sendVerificationEmail } from './email.js';
 
 const router = express.Router();
 
@@ -79,24 +80,111 @@ router.post('/register', async (req, res) => {
       password: hashedPassword,
       role: role || 'farmer',
       location: location || '',
-      phone: phone || ''
+      phone: phone || '',
+      isVerified: true,
+      verificationCode: null,
+      verificationCodeExpires: null
     });
 
     await newUser.save();
-    res.status(201).json({ message: 'User account registered successfully!' });
+
+    res.status(201).json({
+      message: 'User account registered and verified successfully!',
+      email: emailLower
+    });
   } catch (error) {
     console.error('Registration error:', error);
     res.status(500).json({ error: 'An internal server error occurred during registration.' });
   }
 });
 
+// POST /api/auth/verify-email
+router.post('/verify-email', async (req, res) => {
+  try {
+    const { email, code } = req.body;
+    if (!email || !code) {
+      return res.status(400).json({ error: 'Email and verification code are required.' });
+    }
+
+    const emailLower = email.toLowerCase().trim();
+    const user = await UserModel.findOne({ email: emailLower });
+    if (!user) {
+      return res.status(404).json({ error: 'User account not found.' });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({ error: 'This account is already verified. Please log in.' });
+    }
+
+    if (user.verificationCode !== code) {
+      return res.status(400).json({ error: 'Invalid verification code.' });
+    }
+
+    if (user.verificationCodeExpires < new Date()) {
+      return res.status(400).json({ error: 'Verification code has expired. Please request a new one.' });
+    }
+
+    user.isVerified = true;
+    user.verificationCode = null;
+    user.verificationCodeExpires = null;
+    await user.save();
+
+    res.status(200).json({ message: 'Email address verified successfully! You can now log in.' });
+  } catch (error) {
+    console.error('Email verification error:', error);
+    res.status(500).json({ error: 'An internal server error occurred during verification.' });
+  }
+});
+
+// POST /api/auth/resend-verification
+router.post('/resend-verification', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ error: 'Email address is required.' });
+    }
+
+    const emailLower = email.toLowerCase().trim();
+    const user = await UserModel.findOne({ email: emailLower });
+    if (!user) {
+      return res.status(404).json({ error: 'User account not found.' });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({ error: 'This account is already verified. Please log in.' });
+    }
+
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const verificationCodeExpires = new Date(Date.now() + 15 * 60 * 1000);
+
+    user.verificationCode = verificationCode;
+    user.verificationCodeExpires = verificationCodeExpires;
+    await user.save();
+
+    // Trigger real email sending via the nodemailer email service
+    try {
+      await sendVerificationEmail(emailLower, user.name, verificationCode);
+    } catch (emailError) {
+      console.error('Resend email sending failure:', emailError);
+      return res.status(400).json({ error: emailError.message });
+    }
+
+    res.status(200).json({
+      message: 'A fresh verification code has been generated.'
+    });
+  } catch (error) {
+    console.error('Resend verification error:', error);
+    res.status(500).json({ error: 'An internal server error occurred while resending the code.' });
+  }
+});
+
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required.' });
+    if (!email || !password || !role) {
+      return res.status(400).json({ error: 'Email, password, and system role selection are required.' });
     }
 
     const user = await UserModel.findOne({ email: email.toLowerCase().trim() });
@@ -109,20 +197,44 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: 'Invalid email credentials or password.' });
     }
 
-    // Generate JWT Token (HS256)
+    // Ensure email is verified before logging in
+    if (!user.isVerified) {
+      return res.status(400).json({
+        error: 'Please verify your email address before logging in.',
+        isUnverified: true,
+        email: user.email
+      });
+    }
+
+    // Validate that user role matches the selected login role
+    if (user.role !== role) {
+      return res.status(400).json({ error: 'Access Denied: Account role does not match the selected login role.' });
+    }
+
+    // Generate JWT Token (HS256) - Extended to 3 months (90 days)
     const token = jwt.sign(
       { id: user._id, email: user.email, role: user.role },
       jwtSecret,
-      { algorithm: 'HS256', expiresIn: '24h' }
+      { algorithm: 'HS256', expiresIn: '90d' }
     );
 
-    // Set secure cookie
+    // Set secure cookie - Extended to 3 months (90 days)
     res.cookie('__Secure-Token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      maxAge: 90 * 24 * 60 * 60 * 1000 // 90 days (3 months)
     });
+
+    // Update last login time and activity log trail
+    user.lastLogin = new Date();
+    if (!user.activities) user.activities = [];
+    user.activities.push({
+      action: 'Logged in successfully',
+      timestamp: new Date(),
+      details: `Authenticated user as role [${user.role}] successfully.`
+    });
+    await user.save();
 
     res.status(200).json({
       message: 'Login successful!',
@@ -132,7 +244,10 @@ router.post('/login', async (req, res) => {
         email: user.email,
         role: user.role,
         location: user.location,
-        phone: user.phone
+        phone: user.phone,
+        status: user.status,
+        landArea: user.landArea,
+        lastLogin: user.lastLogin
       }
     });
   } catch (error) {

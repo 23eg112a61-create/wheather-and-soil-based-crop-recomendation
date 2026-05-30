@@ -103,6 +103,7 @@ router.post('/upload', authenticateToken, (req, res) => {
 
       // Create a virtual database entry
       const log = new DiseaseDetectionModel({
+        userId: req.user.id,
         image: req.file.filename,
         diseaseName: prediction.diseaseName,
         confidence: prediction.confidence,

@@ -38,7 +38,14 @@ const translations = {
     irrigation: "Smart Irrigation",
     disease: "Disease Detection",
     sensors: "IoT Sensor Feeds",
-    chatbot: "Smart Agro-AI Assistant"
+    chatbot: "Smart Agro-AI Assistant",
+    sustainableFarming: "Sustainable Farming",
+    expertConsultation: "Expert Consultation",
+    trainingEducation: "Training & Education",
+    marketplace: "Agricultural Marketplace",
+    researchHub: "Research & Innovation",
+    livestockDairy: "Livestock & Dairy",
+    analyticsReports: "Analytics & Reports"
   },
   es: {
     title: "Recomendación de Cultivos Basada en el Clima",
@@ -142,8 +149,15 @@ const translations = {
     fertilizer: "ఎరువుల సిఫార్సు",
     irrigation: "స్మార్ట్ నీటి పారుదల",
     disease: "వ్యాధి నిర్ధారణ",
-    sensors: "IoT సెన్సార్స్",
-    chatbot: "స్మార్ట్ వ్యవసాయ AI సహాయకుడు"
+    sensors: "IoT Sensor Feeds",
+    chatbot: "స్మార్ట్ వ్యవసాయ AI సహాయకుడు",
+    sustainableFarming: "సుస్థిర వ్యవసాయం",
+    expertConsultation: "వ్యవసాయ నిపుణుల సంప్రదింపులు",
+    trainingEducation: "శిక్షణ మరియు విద్య",
+    marketplace: "వ్యవసాయ మార్కెట్",
+    researchHub: "పరిశోధన మరియు ఆవిష్కరణ",
+    livestockDairy: "పశుసంవర్ధక మరియు పాల డైరీ",
+    analyticsReports: "విశ్లేషణలు మరియు నివేదికలు"
   }
 };
 
@@ -211,8 +225,8 @@ export const AppProvider = ({ children }) => {
     return translations[language]?.[key] || translations['en']?.[key] || key;
   };
 
-  const login = async (email, password) => {
-    const response = await api.post('/auth/login', { email, password });
+  const login = async (email, password, role) => {
+    const response = await api.post('/auth/login', { email, password, role });
     setUser(response.data.user);
     speak(`${t('welcome')} ${response.data.user.name}`);
     return response.data;
@@ -220,6 +234,16 @@ export const AppProvider = ({ children }) => {
 
   const register = async (name, email, password, role, location, phone) => {
     const response = await api.post('/auth/register', { name, email, password, role, location, phone });
+    return response.data;
+  };
+
+  const verifyEmail = async (email, code) => {
+    const response = await api.post('/auth/verify-email', { email, code });
+    return response.data;
+  };
+
+  const resendVerification = async (email) => {
+    const response = await api.post('/auth/resend-verification', { email });
     return response.data;
   };
 
@@ -263,6 +287,8 @@ export const AppProvider = ({ children }) => {
       voiceActive,
       login,
       register,
+      verifyEmail,
+      resendVerification,
       logout,
       toggleTheme,
       changeLanguage,
