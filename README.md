@@ -137,7 +137,7 @@ c:/Users/vatti/OneDrive/Desktop/CROP-RECOMENDATION-TOOL/
 
 We adhere to rigorous **Secure Web Development Guidelines**:
 1. **Token Protection (BFF/XSS prevention)**: Authentication tokens are stored inside `__Secure-Token` cookies set as `HttpOnly`, `Secure`, and `SameSite=Lax`. This blocks scripts from harvesting credentials during XSS triggers.
-2. **Strict CORS Policy**: Avoids wildcard (`*`) access models. CORS is locked strictly to `http://127.0.0.1:5173` with credentials allowed, blocking malicious requests.
+2. **Strict CORS Policy**: Avoids wildcard (`*`) access models. CORS is locked strictly to allowed localhost development origins and official production/preview domains (`https://wheather-and-soil-based-crop-recomendation-mjrgtsi6l.vercel.app` and matching project subdomains) with credentials allowed, blocking malicious requests.
 3. **Helmet Header Protection**: Activates Helmet headers to stop Content-Type Sniffing (`nosniff`), clickjacking (`X-Frame-Options`), and block unsafe inline script executions.
 4. **Multer Upload Shield**: Files are filtered based on allowed types (`png`, `jpg`, `jpeg`). Filenames are randomized cryptographically, limited to `5MB`, and stored in a non-executable `./uploads/` directory.
 5. **Path Traversal Guards**: The download endpoint sanitizes incoming paths using `path.basename()` and applies strict prefix boundary verification checks to prevent directory escapes.

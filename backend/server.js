@@ -30,7 +30,9 @@ const allowedOrigins = [
   'http://localhost:5174', 'http://127.0.0.1:5174', 'http://[::1]:5174',
   'http://localhost:5175', 'http://127.0.0.1:5175', 'http://[::1]:5175',
   'https://wheather-and-soil-based-crop-recome.vercel.app',
-  'https://wheather-and-soil-based-crop-recome-rust.vercel.app'
+  'https://wheather-and-soil-based-crop-recome-rust.vercel.app',
+  'https://wheather-and-soil-based-crop-recomendation.vercel.app',
+  'https://wheather-and-soil-based-crop-recomendation-mjrgtsi6l.vercel.app'
 ];
 
 if (process.env.FRONTEND_URL) {
@@ -45,7 +47,10 @@ app.use(cors({
     } else {
       // Dynamic allowance for local network IPs and loopback devices on development ports 5173-5179
       const isLocalDev = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\]|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+):517[3-9]$/.test(origin);
-      if (isLocalDev) {
+      // Dynamic allowance for Vercel preview/production deployments associated with the project
+      const isVercelDeploy = /^https:\/\/wheather-and-soil-based-crop-(recomendation|recome)(-[a-zA-Z0-9-]+)?\.vercel\.app$/.test(origin);
+
+      if (isLocalDev || isVercelDeploy) {
         callback(null, true);
       } else {
         console.warn(`[CORS Rejected]: Origin "${origin}" is not in the allow-list.`);
