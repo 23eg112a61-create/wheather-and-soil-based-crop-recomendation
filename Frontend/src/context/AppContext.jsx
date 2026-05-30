@@ -171,11 +171,17 @@ export const AppProvider = ({ children }) => {
   // Verify and fetch profile on boot
   useEffect(() => {
     const initAuth = async () => {
+      const hasSession = localStorage.getItem('hasSession') === 'true';
+      if (!hasSession) {
+        setLoading(false);
+        return;
+      }
       try {
         const response = await api.get('/auth/me');
         setUser(response.data);
       } catch (err) {
         setUser(null);
+        localStorage.removeItem('hasSession');
       } finally {
         setLoading(false);
       }
@@ -228,6 +234,7 @@ export const AppProvider = ({ children }) => {
   const login = async (email, password, role) => {
     const response = await api.post('/auth/login', { email, password, role });
     setUser(response.data.user);
+    localStorage.setItem('hasSession', 'true');
     speak(`${t('welcome')} ${response.data.user.name}`);
     return response.data;
   };
@@ -251,6 +258,7 @@ export const AppProvider = ({ children }) => {
     await api.post('/auth/logout');
     speak("Logged out successfully");
     setUser(null);
+    localStorage.removeItem('hasSession');
     window.location.href = '/';
   };
 
