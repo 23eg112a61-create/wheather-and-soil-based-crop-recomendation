@@ -55,7 +55,7 @@ function App() {
   const { user, theme, toggleTheme, language, changeLanguage, voiceActive, toggleVoice, logout, t } = useApp();
 
   return (
-    <Router>
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <div className="min-h-screen bg-slate-50 text-slate-800 transition-colors duration-200 dark:bg-slate-950 dark:text-slate-100 flex flex-col">
         {/* Navigation Bar */}
         <nav className="sticky top-0 z-40 w-full glassmorphism px-6 py-4 shadow-sm flex items-center justify-between">

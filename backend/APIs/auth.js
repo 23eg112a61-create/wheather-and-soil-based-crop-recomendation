@@ -26,18 +26,28 @@ const isValidPassword = (password) => {
 
 // Middleware: Authenticate JWT Token
 export const authenticateToken = (req, res, next) => {
-  const token = req.cookies['__Secure-Token'] || req.headers['authorization']?.split(' ')[1];
+  const isProd = process.env.NODE_ENV === 'production';
+  const cookieName = isProd ? '__Secure-Token' : 'token';
+  const token =
+    req.cookies?.[cookieName] ||
+    req.headers?.authorization?.split(' ')[1];
 
   if (!token) {
-    return res.status(401).json({ error: 'Access denied. Missing authentication token.' });
+    return res.status(401).json({
+      error: 'Access denied. Missing authentication token.'
+    });
   }
 
   try {
-    const verified = jwt.verify(token, jwtSecret, { algorithms: ['HS256'] });
+    const verified = jwt.verify(token, jwtSecret);
     req.user = verified;
     next();
   } catch (error) {
-    res.status(403).json({ error: 'Invalid or expired token.' });
+    console.error('JWT Verification Error:', error.message);
+
+    return res.status(403).json({
+      error: 'Invalid or expired token.'
+    });
   }
 };
 
@@ -220,11 +230,13 @@ router.post('/login', async (req, res) => {
 
     // Set secure cookie - Extended to 3 months (90 days)
     const isProd = process.env.NODE_ENV === 'production';
-    res.cookie('__Secure-Token', token, {
+    const cookieName = isProd ? '__Secure-Token' : 'token';
+    res.cookie(cookieName, token, {
       httpOnly: true,
       secure: isProd,
       sameSite: isProd ? 'none' : 'lax',
-      maxAge: 90 * 24 * 60 * 60 * 1000 // 90 days (3 months)
+      path: '/',
+      maxAge: 90 * 24 * 60 * 60 * 1000
     });
 
     // Update last login time and activity log trail
@@ -260,12 +272,17 @@ router.post('/login', async (req, res) => {
 // POST /api/auth/logout
 router.post('/logout', (req, res) => {
   const isProd = process.env.NODE_ENV === 'production';
-  res.clearCookie('__Secure-Token', {
+  const cookieName = isProd ? '__Secure-Token' : 'token';
+  res.clearCookie(cookieName, {
     httpOnly: true,
     secure: isProd,
-    sameSite: isProd ? 'none' : 'lax'
+    sameSite: isProd ? 'none' : 'lax',
+    path: '/'
   });
-  res.status(200).json({ message: 'Logged out successfully.' });
+
+  res.status(200).json({
+    message: 'Logged out successfully.'
+  });
 });
 
 // GET /api/auth/me

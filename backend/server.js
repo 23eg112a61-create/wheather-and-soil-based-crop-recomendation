@@ -25,44 +25,58 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 app.use(helmet());
 
 // 2. CORS: Explicit allow-list, NO wildcard * origins
+// 2. CORS Configuration
+let frontendUrl = process.env.FRONTEND_URL;
 const allowedOrigins = [
-  'http://localhost:5173', 'http://127.0.0.1:5173', 'http://[::1]:5173',
-  'http://localhost:5174', 'http://127.0.0.1:5174', 'http://[::1]:5174',
-  'http://localhost:5175', 'http://127.0.0.1:5175', 'http://[::1]:5175',
-  'https://wheather-and-soil-based-crop-recome.vercel.app',
-  'https://wheather-and-soil-based-crop-recome-rust.vercel.app',
-  'https://wheather-and-soil-based-crop-recomendation.vercel.app',
-  'https://wheather-and-soil-based-crop-recomendation-mjrgtsi6l.vercel.app'
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  "http://localhost:5174",
+  "http://127.0.0.1:5174"
 ];
 
-if (process.env.FRONTEND_URL) {
-  allowedOrigins.push(process.env.FRONTEND_URL);
+if (frontendUrl) {
+  frontendUrl = frontendUrl.trim();
+  allowedOrigins.push(frontendUrl);
+  // Auto-resolve production Vercel URL if a dashboard/project URL is provided
+  if (frontendUrl.includes('vercel.com/') && !frontendUrl.endsWith('.vercel.app')) {
+    const parts = frontendUrl.split('/');
+    const projectName = parts[parts.length - 1];
+    if (projectName) {
+      allowedOrigins.push(`https://${projectName}.vercel.app`);
+    }
+  }
 }
 
-app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps, curl, or local tools during dev)
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      // Dynamic allowance for local network IPs and loopback devices on development ports 5173-5179
-      const isLocalDev = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\]|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+):517[3-9]$/.test(origin);
-      // Dynamic allowance for Vercel preview/production deployments associated with the project
-      const isVercelDeploy = /^https:\/\/wheather-and-soil-based-crop-(recomendation|recome)(-[a-zA-Z0-9-]+)?\.vercel\.app$/.test(origin);
-
-      if (isLocalDev || isVercelDeploy) {
-        callback(null, true);
-      } else {
-        console.warn(`[CORS Rejected]: Origin "${origin}" is not in the allow-list.`);
-        callback(new Error(`Rejected: CORS security policy violation. Origin not allowed: ${origin}`));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (Postman, mobile apps, curl)
+      if (!origin) {
+        return callback(null, true);
       }
-    }
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
 
+      // Allow explicitly listed origins
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      // Allow all Vercel deployments of this project (supporting weather and wheather spelling)
+      const isVercelDeployment =
+        /^https:\/\/(wheather|weather)-and-soil-based-crop-.*\.vercel\.app$/.test(origin);
+
+      if (isVercelDeployment) {
+        return callback(null, true);
+      }
+
+      console.log("Blocked by CORS:", origin);
+      return callback(new Error("Origin not allowed by CORS"));
+    },
+
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 // 3. Rate Limiting: Limit requests from single IP to mitigate brute force / DoS
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -111,7 +125,7 @@ app.get('/', (req, res) => {
 // 8. Secure Global Error Handler (Displays generic messages to user, hides stack traces)
 app.use((err, req, res, next) => {
   console.error('[Error Details]:', err.message);
-  
+
   const status = err.status || 500;
   res.status(status).json({
     error: 'An unexpected system error occurred. Please try again later.'
@@ -119,6 +133,8 @@ app.use((err, req, res, next) => {
 });
 
 // 9. Start Server (listen on all network interfaces to allow mobile/LAN device testing)
+// TODO(security): Binding to 0.0.0.0 is intentionally kept here to allow testing on mobile and LAN devices
+// as implemented by the frontend dynamic API resolver. Production deployments should bind strictly to localhost/127.0.0.1.
 const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`========================================`);
   console.log(` AGRO-INTELLIGENCE CORE SERVER RUNNING  `);
