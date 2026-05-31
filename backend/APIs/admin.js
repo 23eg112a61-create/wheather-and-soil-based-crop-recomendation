@@ -97,9 +97,9 @@ router.get('/users', async (req, res) => {
           ]);
         } else if (isAdmin) {
           await FarmerSearchHistory.insertMany([
-            { userId: u._id, query: 'Platform rate limit exception configurations', category: 'System', responseGenerated: 'Configure rateLimit windowMs: 15min, max: 100 requests per IP address.' },
-            { userId: u._id, query: 'Security audit trail logs verification', category: 'Security', responseGenerated: 'Verify that bcrypt hashing uses 10 salt rounds and tokens employ HttpOnly cookies.' },
-            { userId: u._id, query: 'CORS origins permission policies', category: 'Network', responseGenerated: 'Allow explicit origins. Enforce boundary patterns for all dynamic deployments.' }
+            { userId: u._id, query: 'Platform rate limit exception configurations', category: 'General', responseGenerated: 'Configure rateLimit windowMs: 15min, max: 100 requests per IP address.' },
+            { userId: u._id, query: 'Security audit trail logs verification', category: 'General', responseGenerated: 'Verify that bcrypt hashing uses 10 salt rounds and tokens employ HttpOnly cookies.' },
+            { userId: u._id, query: 'CORS origins permission policies', category: 'General', responseGenerated: 'Allow explicit origins. Enforce boundary patterns for all dynamic deployments.' }
           ]);
         } else {
           await FarmerSearchHistory.insertMany([
@@ -497,9 +497,9 @@ router.get('/users/:id/intelligence', async (req, res) => {
         ]);
       } else if (isAdmin) {
         await FarmerSearchHistory.insertMany([
-          { userId, query: 'Platform rate limit exception configurations', category: 'System', responseGenerated: 'Configure rateLimit windowMs: 15min, max: 100 requests per IP address.' },
-          { userId, query: 'Security audit trail logs verification', category: 'Security', responseGenerated: 'Verify that bcrypt hashing uses 10 salt rounds and tokens employ HttpOnly cookies.' },
-          { userId, query: 'CORS origins permission policies', category: 'Network', responseGenerated: 'Allow explicit origins. Enforce boundary patterns for all dynamic deployments.' }
+          { userId, query: 'Platform rate limit exception configurations', category: 'General', responseGenerated: 'Configure rateLimit windowMs: 15min, max: 100 requests per IP address.' },
+          { userId, query: 'Security audit trail logs verification', category: 'General', responseGenerated: 'Verify that bcrypt hashing uses 10 salt rounds and tokens employ HttpOnly cookies.' },
+          { userId, query: 'CORS origins permission policies', category: 'General', responseGenerated: 'Allow explicit origins. Enforce boundary patterns for all dynamic deployments.' }
         ]);
       } else {
         await FarmerSearchHistory.insertMany([

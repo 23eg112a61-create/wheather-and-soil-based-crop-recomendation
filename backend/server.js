@@ -18,6 +18,7 @@ import adminRouter from './APIs/admin.js';
 
 
 const app = express();
+app.set('trust proxy', 1); // Trust reverse proxy (Render, Vercel, etc.)
 const PORT = process.env.PORT || 5000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 

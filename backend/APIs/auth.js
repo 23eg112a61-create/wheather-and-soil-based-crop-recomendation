@@ -26,10 +26,10 @@ const isValidPassword = (password) => {
 
 // Middleware: Authenticate JWT Token
 export const authenticateToken = (req, res, next) => {
-  const isProd = process.env.NODE_ENV === 'production';
-  const cookieName = isProd ? '__Secure-Token' : 'token';
+  // Support both development 'token' and production '__Secure-Token' seamlessly, alongside standard Authorization headers
   const token =
-    req.cookies?.[cookieName] ||
+    req.cookies?.['__Secure-Token'] ||
+    req.cookies?.['token'] ||
     req.headers?.authorization?.split(' ')[1];
 
   if (!token) {
@@ -229,12 +229,16 @@ router.post('/login', async (req, res) => {
     );
 
     // Set secure cookie - Extended to 3 months (90 days)
-    const isProd = process.env.NODE_ENV === 'production';
-    const cookieName = isProd ? '__Secure-Token' : 'token';
+    // Dynamically resolve whether to use production-grade secure cross-site cookies
+    const isSecureConnection = req.secure || req.headers['x-forwarded-proto'] === 'https';
+    const isLocalhost = req.get('origin') ? (req.get('origin').includes('localhost') || req.get('origin').includes('127.0.0.1')) : true;
+    const useSecureCookie = process.env.NODE_ENV === 'production' || (isSecureConnection && !isLocalhost);
+
+    const cookieName = useSecureCookie ? '__Secure-Token' : 'token';
     res.cookie(cookieName, token, {
       httpOnly: true,
-      secure: isProd,
-      sameSite: isProd ? 'none' : 'lax',
+      secure: useSecureCookie,
+      sameSite: useSecureCookie ? 'none' : 'lax',
       path: '/',
       maxAge: 90 * 24 * 60 * 60 * 1000
     });
@@ -271,12 +275,21 @@ router.post('/login', async (req, res) => {
 
 // POST /api/auth/logout
 router.post('/logout', (req, res) => {
-  const isProd = process.env.NODE_ENV === 'production';
-  const cookieName = isProd ? '__Secure-Token' : 'token';
-  res.clearCookie(cookieName, {
+  const isSecureConnection = req.secure || req.headers['x-forwarded-proto'] === 'https';
+  const isLocalhost = req.get('origin') ? (req.get('origin').includes('localhost') || req.get('origin').includes('127.0.0.1')) : true;
+  const useSecureCookie = process.env.NODE_ENV === 'production' || (isSecureConnection && !isLocalhost);
+
+  // Clear both possible cookie configurations to guarantee robust sign-out across dev and prod environments
+  res.clearCookie('__Secure-Token', {
     httpOnly: true,
-    secure: isProd,
-    sameSite: isProd ? 'none' : 'lax',
+    secure: useSecureCookie,
+    sameSite: useSecureCookie ? 'none' : 'lax',
+    path: '/'
+  });
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: useSecureCookie,
+    sameSite: useSecureCookie ? 'none' : 'lax',
     path: '/'
   });
 
