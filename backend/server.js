@@ -40,8 +40,10 @@ if (frontendUrl) {
   // Auto-resolve production Vercel URL if a dashboard/project URL is provided
   if (frontendUrl.includes('vercel.com/') && !frontendUrl.endsWith('.vercel.app')) {
     const parts = frontendUrl.split('/');
-    const projectName = parts[parts.length - 1];
+    let projectName = parts[parts.length - 1];
     if (projectName) {
+      // Safely strip any trailing hyphens, slashes, or special symbols
+      projectName = projectName.replace(/[-_/]+$/, '');
       allowedOrigins.push(`https://${projectName}.vercel.app`);
     }
   }
@@ -62,7 +64,8 @@ app.use(
 
       // Allow all Vercel deployments of this project (supporting weather and wheather spelling)
       const isVercelDeployment =
-        /^https:\/\/(wheather|weather)-and-soil-based-crop-.*\.vercel\.app$/.test(origin);
+        /^https:\/\/(wheather|weather)-and-soil-based-crop-.*\.vercel\.app$/.test(origin) ||
+        (origin.includes('vercel.app') && (origin.includes('wheather-and-soil-based-crop') || origin.includes('weather-and-soil-based-crop')));
 
       if (isVercelDeployment) {
         return callback(null, true);

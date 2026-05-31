@@ -16,8 +16,8 @@ const getApiBaseUrl = () => {
     return `http://${hostname}:5000/api`;
   }
 
-  // Otherwise, use configured VITE_API_URL or fallback
-  let envUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api';
+  // Otherwise, use configured VITE_API_URL or fallback to production Render backend
+  let envUrl = import.meta.env.VITE_API_URL || 'https://wheather-and-soil-based-crop.onrender.com/api';
   
   envUrl = envUrl.trim();
   
