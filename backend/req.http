@@ -2,7 +2,7 @@
 # Local Development API:
 # @baseUrl = http://127.0.0.1:5000/api
 # Render Production API:
-@baseUrl = https://wheather-and-soil-based-crop-za2r.onrender.com/api
+@baseUrl = https://wheather-and-soil-based-crop.onrender.com/api
 
 ### 1. Register User (Farmer Account)
 POST {{baseUrl}}/auth/register

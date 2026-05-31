@@ -114,7 +114,7 @@ c:/Users/vatti/OneDrive/Desktop/CROP-RECOMENDATION-TOOL/
    npm run dev
    ```
    *The server mounts strictly on `http://127.0.0.1:5000` for development security.*
-   *Production server is hosted on Render at `https://wheather-and-soil-based-crop-za2r.onrender.com`.*
+   *Production server is hosted on Render at `https://wheather-and-soil-based-crop.onrender.com`.*
 
 ### 3. Frontend Installation
 1. Navigate to the capitalized Frontend directory:

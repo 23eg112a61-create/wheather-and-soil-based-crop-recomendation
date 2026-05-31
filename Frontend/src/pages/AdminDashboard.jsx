@@ -618,16 +618,14 @@ const AdminDashboard = () => {
                         <td className="py-3.5 px-3 text-center flex items-center justify-center space-x-1">
                           
                           {/* DYNAMIC VIEW FULL PROFILE BUTTON */}
-                          {u.role === 'farmer' && (
-                            <button
-                              type="button"
-                              onClick={() => fetchFarmerIntelligence(u)}
-                              className="bg-emerald-600 hover:bg-emerald-500 text-white p-1.5 rounded-lg transition-colors flex items-center justify-center"
-                              title="View Full Profile & Complete Search History"
-                            >
-                              <Sparkles size={13} />
-                            </button>
-                          )}
+                          <button
+                            type="button"
+                            onClick={() => fetchFarmerIntelligence(u)}
+                            className="bg-emerald-600 hover:bg-emerald-500 text-white p-1.5 rounded-lg transition-colors flex items-center justify-center"
+                            title="View Full Profile & Complete Search History"
+                          >
+                            <Sparkles size={13} />
+                          </button>
 
                           {/* VIEW INFO BUTTON */}
                           <button

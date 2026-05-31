@@ -1,22 +1,30 @@
 import axios from 'axios';
 
-// Dynamically resolve API URL to support testing on mobile/other devices on the local network
 const getApiBaseUrl = () => {
-  const envUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api';
   const hostname = window.location.hostname;
+  
+  // If running locally on localhost/loopback, use local port 5000
+  if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]') {
+    return 'http://localhost:5000/api';
+  }
 
-  // If we are accessing the app via a local network IP address (e.g., 192.168.x.x)
-  // rather than localhost, dynamically point the backend API call to that same network IP.
-  if (hostname !== 'localhost' && hostname !== '127.0.0.1' && hostname !== '[::1]') {
-    try {
-      const url = new URL(envUrl);
-      if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') {
-        url.hostname = hostname;
-        return url.toString();
-      }
-    } catch (e) {
-      // Fallback in case URL parsing fails
-    }
+  // If accessing via local network IP (e.g. 192.168.x.x or 10.x.x.x or 172.x.x.x)
+  const isLocalIp = /^192\.168\.\d+\.\d+$/.test(hostname) || 
+                    /^10\.\d+\.\d+\.\d+$/.test(hostname) || 
+                    /^172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+$/.test(hostname);
+  if (isLocalIp) {
+    return `http://${hostname}:5000/api`;
+  }
+
+  // Otherwise, use configured VITE_API_URL or fallback
+  let envUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api';
+  
+  envUrl = envUrl.trim();
+  if (envUrl.endsWith('/')) {
+    envUrl = envUrl.slice(0, -1);
+  }
+  if (!envUrl.endsWith('/api')) {
+    envUrl = envUrl + '/api';
   }
   return envUrl;
 };

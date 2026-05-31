@@ -31,7 +31,7 @@ router.use(requireRole(['admin']));
 // ==========================================
 router.get('/users', async (req, res) => {
   try {
-    const users = await UserModel.find().select('-password').sort({ createdAt: -1 });
+    const users = await UserModel.find().sort({ createdAt: -1 });
     
     // Seed initial realistic dummy logs for empty users to keep UI beautiful immediately
     const updatedUsers = await Promise.all(users.map(async (u) => {
@@ -68,8 +68,98 @@ router.get('/users', async (req, res) => {
       if (changed) {
         await u.save();
       }
-      return u;
+
+      // Seed complete Farmer/Expert/Admin Intelligence data automatically if location doesn't exist yet
+      let location = await FarmerLocations.findOne({ userId: u._id });
+      if (!location) {
+        console.log(`[AUTOMATIC SEEDING] Initializing agricultural telemetry records for user: ${u.name}`);
+        const isExpert = u.role === 'expert';
+        const isAdmin = u.role === 'admin';
+        
+        location = new FarmerLocations({
+          userId: u._id,
+          currentLocation: u.location || (isExpert ? 'Delhi Agricultural Extension Office' : isAdmin ? 'Central Systems HQ' : 'Gill Village sector, Ludhiana'),
+          district: isExpert ? 'New Delhi' : isAdmin ? 'Mumbai' : 'Ludhiana',
+          state: isExpert ? 'Delhi' : isAdmin ? 'Maharashtra' : 'Punjab',
+          village: isExpert ? 'Delhi Sector 12' : isAdmin ? 'Central District' : 'Gill Village',
+          gpsCoordinates: isExpert ? '28.6139° N, 77.2090° E' : isAdmin ? '18.9220° N, 72.8347° E' : '30.8601° N, 75.8592° E',
+          boundaryCoordinates: ['30.8601,75.8592', '30.8621,75.8592', '30.8621,75.8612', '30.8601,75.8612'],
+          farmArea: (isExpert || isAdmin) ? 'N/A' : (u.landArea || '12 Hectares'),
+          soilZone: isExpert ? 'Silt Loam Area Beta' : isAdmin ? 'Urban Zone Gamma' : 'Clay Loam Zone Alpha'
+        });
+        await location.save();
+
+        if (isExpert) {
+          await FarmerSearchHistory.insertMany([
+            { userId: u._id, query: 'Standard protocol for tomato late blight treatment', category: 'Disease', responseGenerated: 'Apply Copper Hydroxide and systemic fungicides. Keep field ventilation standard.' },
+            { userId: u._id, query: 'Soil analysis calibration for NPK wireless nodes', category: 'Soil', responseGenerated: 'RS485 sensor probe mapping: Nitrogen 0-200 mg/kg, Phosphorus 0-100 mg/kg.' },
+            { userId: u._id, query: 'Sustainable organic crop rotation models', category: 'Crop', responseGenerated: 'Include deep-rooting legumes and shallow-rooted grain cereals to balance macronutrients.' }
+          ]);
+        } else if (isAdmin) {
+          await FarmerSearchHistory.insertMany([
+            { userId: u._id, query: 'Platform rate limit exception configurations', category: 'System', responseGenerated: 'Configure rateLimit windowMs: 15min, max: 100 requests per IP address.' },
+            { userId: u._id, query: 'Security audit trail logs verification', category: 'Security', responseGenerated: 'Verify that bcrypt hashing uses 10 salt rounds and tokens employ HttpOnly cookies.' },
+            { userId: u._id, query: 'CORS origins permission policies', category: 'Network', responseGenerated: 'Allow explicit origins. Enforce boundary patterns for all dynamic deployments.' }
+          ]);
+        } else {
+          await FarmerSearchHistory.insertMany([
+            { userId: u._id, query: 'What crop is suitable for red soil?', category: 'Crop', responseGenerated: 'Legumes (Beans) and high-drainage root tubers are highly recommended due to high iron-oxide layers.' },
+            { userId: u._id, query: 'NPK recommendation for rice', category: 'Soil', responseGenerated: 'Target ratio: N:120 P:60 K:40. Deficiencies detected in Nitrogen. Apply urea fertilizers.' },
+            { userId: u._id, query: 'Tomato leaf disease late blight', category: 'Disease', responseGenerated: 'Late blight fungal spores detected. Apply Mancozeb or Chlorothalonil sprays immediately.' },
+            { userId: u._id, query: 'Rain forecast in Ludhiana', category: 'Weather', responseGenerated: 'Heavy monsoon rains forecasted in next 48 hours. Rainfall: 180mm. Ensure field drainage.' }
+          ]);
+        }
+
+        await FarmerWeatherQueries.insertMany([
+          { userId: u._id, weatherLocation: isExpert ? 'New Delhi, Delhi' : isAdmin ? 'Mumbai, MH' : 'Ludhiana, Punjab', temperature: 32.5, rainfall: 180.0, humidity: 78, forecastReturned: 'Heavy monsoon rain warnings. Expected rainfall accumulation: 180mm over 48 hours.' },
+          { userId: u._id, weatherLocation: isExpert ? 'New Delhi, Delhi' : isAdmin ? 'Mumbai, MH' : 'Ludhiana, Punjab', temperature: 29.8, rainfall: 12.5, humidity: 64, forecastReturned: 'Partially cloudy conditions with moderate winds. High soil moisture retained.' }
+        ]);
+
+        await FarmerRecommendations.insertMany([
+          { userId: u._id, cropRecommended: isExpert ? 'Organic Wheat' : isAdmin ? 'Green Vegetables' : 'Basmati Rice', confidenceScore: 95, reason: 'High soil humidity (78%), acidic-neutral pH (6.2) and high water logging capacity.', expertApprovalStatus: 'Approved' },
+          { userId: u._id, cropRecommended: isExpert ? 'Horticultural Tomato' : isAdmin ? 'Smart Turf' : 'Loamy Maize', confidenceScore: 82, reason: 'Optimal soil nitrogen levels (85 mg/kg) matched to Kharif weather ranges.', expertApprovalStatus: 'Pending' }
+        ]);
+
+        await FarmerDiseaseReports.insertMany([
+          { userId: u._id, uploadedLeafImage: 'tomato_crop.png', diseaseDetected: 'Tomato Late Blight', confidenceScore: 94, treatmentSuggested: 'Apply Copper Hydroxide bacterial spray. Wide spacing layout recommended to allow leaf ventilation.', expertValidation: 'Validated' },
+          { userId: u._id, uploadedLeafImage: 'rice_crop.png', diseaseDetected: 'Rice Blast Fungus', confidenceScore: 96, treatmentSuggested: 'Apply Tricyclazole systemic fungicides. Temporarily reduce standing field water depths.', expertValidation: 'Validated' }
+        ]);
+
+        await FarmerConsultations.insertMany([
+          {
+            userId: u._id,
+            expertName: 'Dr. Ramesh Rao',
+            chatTranscript: [
+              { sender: 'farmer', message: 'Foliar spots appearing on Rice Block. Moisture stands high at 45%.', timestamp: new Date(Date.now() - 3600000 * 24) },
+              { sender: 'expert', message: 'Looks like early Rice Blast development. Spray Tricyclazole and adjust irrigation rates.', timestamp: new Date(Date.now() - 3600000 * 23) }
+            ],
+            resolutionStatus: 'Resolved'
+          }
+        ]);
+
+        await FarmerActivityLogs.insertMany([
+          { userId: u._id, action: 'Logged In', module: 'Authentication', status: 'Success', ipAddress: '192.168.1.102' },
+          { userId: u._id, action: 'Requested Crop Recommendation', module: 'Crop Recommendation', status: 'Success', ipAddress: '192.168.1.102' },
+          { userId: u._id, action: 'Uploaded Disease Image', module: 'Disease Detection', status: 'Success', ipAddress: '192.168.1.102' },
+          { userId: u._id, action: 'Booked Consultation', module: 'Expert Consult', status: 'Success', ipAddress: '192.168.1.102' }
+        ]);
+
+        await FarmerAdvisory.insertMany([
+          { userId: u._id, advisoryType: 'Monsoon Advisory', message: 'Heavy rainfall warning active. Pause automated water pump cycles to avoid deep root drowning.', acknowledgementStatus: 'Acknowledged' },
+          { userId: u._id, advisoryType: 'Frost Alert', message: 'Night temperature expected to fall below 5°C. Enforce warm smoke layouts or light watering cycles.', acknowledgementStatus: 'Read' }
+        ]);
+
+        await FarmerFertilizer.insertMany([
+          { userId: u._id, nValue: 85, pValue: 48, kValue: 42, soilType: 'Clay Loam', recommendedFertilizer: 'DAP + Muriate of Potash', dosage: '250 kg/Hectare', applicationSchedule: 'Apply 50% at sowing, 25% during tillering, and 25% at panicle initiation.' }
+        ]);
+      }
+      
+      const userObj = u.toObject();
+      delete userObj.password;
+      return userObj;
     }));
+
+
 
     res.status(200).json(updatedUsers);
   } catch (error) {
@@ -381,27 +471,44 @@ router.get('/users/:id/intelligence', async (req, res) => {
     if (!location) {
       console.log(`[INTELLIGENCE SEEDING] Initializing realistic agricultural telemetry records for farmer ID: ${userId}`);
 
-      // Seed 1. Farmer Location Intelligence
+      // Seed 1. Bio Location Intelligence (Dynamic by role)
+      const isExpert = user.role === 'expert';
+      const isAdmin = user.role === 'admin';
+      
       location = new FarmerLocations({
         userId,
-        currentLocation: user.location || 'Gill Village sector, Ludhiana',
-        district: 'Ludhiana',
-        state: 'Punjab',
-        village: 'Gill Village',
-        gpsCoordinates: '30.8601° N, 75.8592° E',
+        currentLocation: user.location || (isExpert ? 'Delhi Agricultural Extension Office' : isAdmin ? 'Central Systems HQ' : 'Gill Village sector, Ludhiana'),
+        district: isExpert ? 'New Delhi' : isAdmin ? 'Mumbai' : 'Ludhiana',
+        state: isExpert ? 'Delhi' : isAdmin ? 'Maharashtra' : 'Punjab',
+        village: isExpert ? 'Delhi Sector 12' : isAdmin ? 'Central District' : 'Gill Village',
+        gpsCoordinates: isExpert ? '28.6139° N, 77.2090° E' : isAdmin ? '18.9220° N, 72.8347° E' : '30.8601° N, 75.8592° E',
         boundaryCoordinates: ['30.8601,75.8592', '30.8621,75.8592', '30.8621,75.8612', '30.8601,75.8612'],
-        farmArea: user.landArea || '12 Hectares',
-        soilZone: 'Clay Loam Zone Alpha'
+        farmArea: (isExpert || isAdmin) ? 'N/A' : (user.landArea || '12 Hectares'),
+        soilZone: isExpert ? 'Silt Loam Area Beta' : isAdmin ? 'Urban Zone Gamma' : 'Clay Loam Zone Alpha'
       });
       await location.save();
 
-      // Seed 2. Search History Timeline
-      await FarmerSearchHistory.insertMany([
-        { userId, query: 'What crop is suitable for red soil?', category: 'Crop', responseGenerated: 'Legumes (Beans) and high-drainage root tubers are highly recommended due to high iron-oxide layers.' },
-        { userId, query: 'NPK recommendation for rice', category: 'Soil', responseGenerated: 'Target ratio: N:120 P:60 K:40. Deficiencies detected in Nitrogen. Apply urea fertilizers.' },
-        { userId, query: 'Tomato leaf disease late blight', category: 'Disease', responseGenerated: 'Late blight fungal spores detected. Apply Mancozeb or Chlorothalonil sprays immediately.' },
-        { userId, query: 'Rain forecast in Ludhiana', category: 'Weather', responseGenerated: 'Heavy monsoon rains forecasted in next 48 hours. Rainfall: 180mm. Ensure field drainage.' }
-      ]);
+      // Seed 2. Search History Timeline (Dynamic by role)
+      if (isExpert) {
+        await FarmerSearchHistory.insertMany([
+          { userId, query: 'Standard protocol for tomato late blight treatment', category: 'Disease', responseGenerated: 'Apply Copper Hydroxide and systemic fungicides. Keep field ventilation standard.' },
+          { userId, query: 'Soil analysis calibration for NPK wireless nodes', category: 'Soil', responseGenerated: 'RS485 sensor probe mapping: Nitrogen 0-200 mg/kg, Phosphorus 0-100 mg/kg.' },
+          { userId, query: 'Sustainable organic crop rotation models', category: 'Crop', responseGenerated: 'Include deep-rooting legumes and shallow-rooted grain cereals to balance macronutrients.' }
+        ]);
+      } else if (isAdmin) {
+        await FarmerSearchHistory.insertMany([
+          { userId, query: 'Platform rate limit exception configurations', category: 'System', responseGenerated: 'Configure rateLimit windowMs: 15min, max: 100 requests per IP address.' },
+          { userId, query: 'Security audit trail logs verification', category: 'Security', responseGenerated: 'Verify that bcrypt hashing uses 10 salt rounds and tokens employ HttpOnly cookies.' },
+          { userId, query: 'CORS origins permission policies', category: 'Network', responseGenerated: 'Allow explicit origins. Enforce boundary patterns for all dynamic deployments.' }
+        ]);
+      } else {
+        await FarmerSearchHistory.insertMany([
+          { userId, query: 'What crop is suitable for red soil?', category: 'Crop', responseGenerated: 'Legumes (Beans) and high-drainage root tubers are highly recommended due to high iron-oxide layers.' },
+          { userId, query: 'NPK recommendation for rice', category: 'Soil', responseGenerated: 'Target ratio: N:120 P:60 K:40. Deficiencies detected in Nitrogen. Apply urea fertilizers.' },
+          { userId, query: 'Tomato leaf disease late blight', category: 'Disease', responseGenerated: 'Late blight fungal spores detected. Apply Mancozeb or Chlorothalonil sprays immediately.' },
+          { userId, query: 'Rain forecast in Ludhiana', category: 'Weather', responseGenerated: 'Heavy monsoon rains forecasted in next 48 hours. Rainfall: 180mm. Ensure field drainage.' }
+        ]);
+      }
 
       // Seed 3. Weather Query History
       await FarmerWeatherQueries.insertMany([
