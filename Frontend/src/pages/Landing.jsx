@@ -56,43 +56,19 @@ const Landing = () => {
           </p>
 
           <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center items-center w-full">
-            {user ? (
-              <>
-                <Link
-                  to="/crop-recommendation"
-                  className="bg-[#10b981] hover:bg-emerald-650 text-slate-900 font-bold px-8 py-3.5 rounded-full shadow-lg hover:shadow-emerald-500/30 transition-all flex items-center space-x-2 transform hover:-translate-y-0.5 w-full sm:w-auto justify-center"
-                >
-                  <span>Get Started Now</span>
-                  <ArrowRight size={18} />
-                </Link>
-                <Link
-                  to={
-                    user.role === 'admin' ? '/dashboard/admin' :
-                    user.role === 'expert' ? '/dashboard/expert' :
-                    '/dashboard/farmer'
-                  }
-                  className="bg-[#0f172a]/30 border border-white/20 hover:bg-[#0f172a]/55 text-white font-bold px-8 py-3.5 rounded-full transition-all shadow-md transform hover:-translate-y-0.5 backdrop-blur-md w-full sm:w-auto justify-center flex items-center"
-                >
-                  Dashboard
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link
-                  to="/signup"
-                  className="bg-[#10b981] hover:bg-emerald-600 text-slate-900 font-bold px-8 py-3.5 rounded-full shadow-lg hover:shadow-emerald-500/30 transition-all flex items-center space-x-2 transform hover:-translate-y-0.5 w-full sm:w-auto justify-center"
-                >
-                  <span>Get Started Now</span>
-                  <ArrowRight size={18} />
-                </Link>
-                <Link
-                  to="/login"
-                  className="bg-[#0f172a]/30 border border-white/20 hover:bg-[#0f172a]/55 text-white font-bold px-8 py-3.5 rounded-full transition-all shadow-md transform hover:-translate-y-0.5 backdrop-blur-md w-full sm:w-auto justify-center flex items-center"
-                >
-                  Login
-                </Link>
-              </>
-            )}
+            <Link
+              to={user ? "/crop-recommendation" : "/signup"}
+              className="bg-[#10b981] hover:bg-emerald-600 text-slate-900 font-bold px-8 py-3.5 rounded-full shadow-lg hover:shadow-emerald-500/30 transition-all flex items-center space-x-2 transform hover:-translate-y-0.5 w-full sm:w-auto justify-center"
+            >
+              <span>Get Started Now</span>
+              <ArrowRight size={18} />
+            </Link>
+            <Link
+              to="/login"
+              className="bg-[#0f172a]/30 border border-white/20 hover:bg-[#0f172a]/55 text-white font-bold px-8 py-3.5 rounded-full transition-all shadow-md transform hover:-translate-y-0.5 backdrop-blur-md w-full sm:w-auto justify-center flex items-center"
+            >
+              Login
+            </Link>
           </div>
         </div>
 
