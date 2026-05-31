@@ -4,7 +4,7 @@ import { useApp } from '../context/AppContext';
 import { Leaf, Sun, Cpu, ShieldCheck, ArrowRight, Activity, CheckCircle, ChevronDown } from 'lucide-react';
 
 const Landing = () => {
-  const { user, t, speak } = useApp();
+  const { user, language, t, speak } = useApp();
   const [ph, setPh] = useState(6.5);
   const [moisture, setMoisture] = useState(50);
 
@@ -36,40 +36,58 @@ const Landing = () => {
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-emerald-950/40 z-0"></div>
         
         {/* Left Column Copywriting centered inside container */}
-        <div className="relative max-w-3xl z-10 space-y-8 flex flex-col items-center">
-          <div className="inline-flex items-center space-x-2 bg-emerald-900/60 border border-emerald-500/40 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider text-emerald-300 backdrop-blur-md">
-            <Activity size={12} className="animate-pulse" />
+        <div className="relative max-w-4xl z-10 space-y-6 flex flex-col items-center">
+          <div className="inline-flex items-center space-x-2 bg-[#042f1a]/80 border border-emerald-500/30 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider text-emerald-400 backdrop-blur-md">
+            <Activity size={12} className="animate-pulse text-emerald-450" />
             <span>Weather-Based Crop Recommendation Platform</span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight leading-none text-white drop-shadow-md">
-            {t('landingTagline')}
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.1] text-white drop-shadow-md">
+            {language === 'en' ? (
+              <>
+                Weather-Based Crop <br />
+                Recommendation <br />
+                System
+              </>
+            ) : t('landingTagline')}
           </h1>
-          <p className="text-base sm:text-lg md:text-xl text-slate-200 font-light leading-relaxed max-w-xl mx-auto drop-shadow">
+          <p className="text-sm sm:text-base md:text-lg text-slate-200 font-light leading-relaxed max-w-xl mx-auto drop-shadow">
             {t('landingSub')}
           </p>
 
           <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center items-center w-full">
             {user ? (
-              <Link
-                to="/crop-recommendation"
-                className="bg-emerald-500 hover:bg-emerald-600 text-slate-900 font-extrabold px-10 py-4.5 rounded-2xl shadow-lg hover:shadow-emerald-500/30 transition-all flex items-center space-x-2 transform hover:-translate-y-0.5"
-              >
-                <span>Generate AI Recommendation</span>
-                <ArrowRight size={18} />
-              </Link>
+              <>
+                <Link
+                  to="/crop-recommendation"
+                  className="bg-[#10b981] hover:bg-emerald-650 text-slate-900 font-bold px-8 py-3.5 rounded-full shadow-lg hover:shadow-emerald-500/30 transition-all flex items-center space-x-2 transform hover:-translate-y-0.5 w-full sm:w-auto justify-center"
+                >
+                  <span>Get Started Now</span>
+                  <ArrowRight size={18} />
+                </Link>
+                <Link
+                  to={
+                    user.role === 'admin' ? '/dashboard/admin' :
+                    user.role === 'expert' ? '/dashboard/expert' :
+                    '/dashboard/farmer'
+                  }
+                  className="bg-[#0f172a]/30 border border-white/20 hover:bg-[#0f172a]/55 text-white font-bold px-8 py-3.5 rounded-full transition-all shadow-md transform hover:-translate-y-0.5 backdrop-blur-md w-full sm:w-auto justify-center flex items-center"
+                >
+                  Dashboard
+                </Link>
+              </>
             ) : (
               <>
                 <Link
                   to="/signup"
-                  className="bg-emerald-500 hover:bg-emerald-600 text-slate-900 font-extrabold px-10 py-4.5 rounded-2xl shadow-lg hover:shadow-emerald-500/30 transition-all flex items-center space-x-2 transform hover:-translate-y-0.5 w-full sm:w-auto justify-center"
+                  className="bg-[#10b981] hover:bg-emerald-600 text-slate-900 font-bold px-8 py-3.5 rounded-full shadow-lg hover:shadow-emerald-500/30 transition-all flex items-center space-x-2 transform hover:-translate-y-0.5 w-full sm:w-auto justify-center"
                 >
                   <span>Get Started Now</span>
                   <ArrowRight size={18} />
                 </Link>
                 <Link
                   to="/login"
-                  className="bg-slate-900/90 border border-slate-700 hover:bg-slate-800 text-white font-bold px-10 py-4.5 rounded-2xl transition-all shadow-md transform hover:-translate-y-0.5 backdrop-blur-md w-full sm:w-auto justify-center flex items-center"
+                  className="bg-[#0f172a]/30 border border-white/20 hover:bg-[#0f172a]/55 text-white font-bold px-8 py-3.5 rounded-full transition-all shadow-md transform hover:-translate-y-0.5 backdrop-blur-md w-full sm:w-auto justify-center flex items-center"
                 >
                   Login
                 </Link>
@@ -84,6 +102,7 @@ const Landing = () => {
           <ChevronDown size={18} className="mt-1" />
         </div>
       </section>
+
 
       {/* 2. MAIN CORE FEATURES MATRIX */}
       <section className="py-20 px-6 max-w-7xl mx-auto w-full">
