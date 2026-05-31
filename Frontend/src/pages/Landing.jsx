@@ -57,7 +57,7 @@ const Landing = () => {
 
           <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center items-center w-full">
             <Link
-              to={user ? "/crop-recommendation" : "/signup"}
+              to="/signup"
               className="bg-[#10b981] hover:bg-emerald-600 text-slate-900 font-bold px-8 py-3.5 rounded-full shadow-lg hover:shadow-emerald-500/30 transition-all flex items-center space-x-2 transform hover:-translate-y-0.5 w-full sm:w-auto justify-center"
             >
               <span>Get Started Now</span>
