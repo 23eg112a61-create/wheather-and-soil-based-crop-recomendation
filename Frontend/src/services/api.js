@@ -20,6 +20,12 @@ const getApiBaseUrl = () => {
   let envUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api';
   
   envUrl = envUrl.trim();
+  
+  // Safeguard: If the Vercel project dashboard URL was accidentally set as VITE_API_URL, redirect it to Render backend
+  if (envUrl.includes('vercel.com')) {
+    envUrl = 'https://wheather-and-soil-based-crop.onrender.com/api';
+  }
+
   if (envUrl.endsWith('/')) {
     envUrl = envUrl.slice(0, -1);
   }
