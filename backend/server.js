@@ -19,7 +19,7 @@ import adminRouter from './APIs/admin.js';
 
 const app = express();
 app.set('trust proxy', 1); // Trust reverse proxy (Render, Vercel, etc.)
-const PORT = process.env.PORT || 5000;
+const DEFAULT_PORT = Number(process.env.PORT) || 5000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // 1. Helmet: Secure HTTP Headers
@@ -139,13 +139,29 @@ app.use((err, req, res, next) => {
 // 9. Start Server (listen on all network interfaces to allow mobile/LAN device testing)
 // TODO(security): Binding to 0.0.0.0 is intentionally kept here to allow testing on mobile and LAN devices
 // as implemented by the frontend dynamic API resolver. Production deployments should bind strictly to localhost/127.0.0.1.
-const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`========================================`);
-  console.log(` AGRO-INTELLIGENCE CORE SERVER RUNNING  `);
-  console.log(` Port: ${PORT}                          `);
-  console.log(` Host: http://0.0.0.0:${PORT}          `);
-  console.log(` Environment: ${NODE_ENV}               `);
-  console.log(`========================================`);
-});
+const startServer = (port) => {
+  const server = app.listen(port, '0.0.0.0', () => {
+    console.log(`========================================`);
+    console.log(` AGRO-INTELLIGENCE CORE SERVER RUNNING  `);
+    console.log(` Port: ${port}                          `);
+    console.log(` Host: http://0.0.0.0:${port}          `);
+    console.log(` Environment: ${NODE_ENV}               `);
+    console.log(`========================================`);
+  });
+
+  server.on('error', (error) => {
+    if (error.code === 'EADDRINUSE') {
+      const fallbackPort = port + 1;
+      console.warn(`Port ${port} is already in use. Retrying on port ${fallbackPort}...`);
+      startServer(fallbackPort);
+      return;
+    }
+
+    console.error('Server startup failed:', error);
+    process.exit(1);
+  });
+};
+
+startServer(DEFAULT_PORT);
 
 export default app;

@@ -221,14 +221,14 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: 'Access Denied: Account role does not match the selected login role.' });
     }
 
-    // Generate JWT Token (HS256) - Extended to 3 months (90 days)
+    // Generate JWT Token (HS256) - Valid for 1 year
     const token = jwt.sign(
       { id: user._id, email: user.email, role: user.role },
       jwtSecret,
-      { algorithm: 'HS256', expiresIn: '90d' }
+      { algorithm: 'HS256', expiresIn: 365 * 24 * 60 * 60 }
     );
 
-    // Set secure cookie - Extended to 3 months (90 days)
+    // Set secure cookie - Valid for 1 year
     // Dynamically resolve whether to use production-grade secure cross-site cookies
     const isSecureConnection = req.secure || req.headers['x-forwarded-proto'] === 'https';
     const isLocalhost = req.get('origin') ? (req.get('origin').includes('localhost') || req.get('origin').includes('127.0.0.1')) : true;
@@ -240,7 +240,7 @@ router.post('/login', async (req, res) => {
       secure: useSecureCookie,
       sameSite: useSecureCookie ? 'none' : 'lax',
       path: '/',
-      maxAge: 90 * 24 * 60 * 60 * 1000
+      maxAge: 365 * 24 * 60 * 60 * 1000
     });
 
     // Update last login time and activity log trail
